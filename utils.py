@@ -261,8 +261,8 @@ def generateImageGrid(I,
 
         if (not cond[i, 0]) or override:
             # If pupil center exists
-            rr, cc = draw.disk((pupil_center[i, 1].clip(6, im.shape[0]-6),
-                                pupil_center[i, 0].clip(6, im.shape[1]-6)),
+            rr, cc = draw.circle(pupil_center[i, 1].clip(6, im.shape[0]-6),
+                                pupil_center[i, 0].clip(6, im.shape[1]-6),
                                  5)
             im[rr, cc, ...] = 255
         I_o.append(im)
@@ -296,8 +296,12 @@ def calc_edge(args, img, edge_model, device):
         torch.backends.cudnn.deterministic = False
         torch.backends.cudnn.benchmark = True
         img_edge = edge_model(torch.cat((img, img, img), dim=1).to(device).to(args.prec))[-1]
+
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
+    if (args.edge_thres == 1):
+        rt = torch.ones(img_edge.size()).to(device).to(args.prec)
+        img_edge = torch.where(img_edge >= 0.1, rt, img_edge)
     return img_edge
 
 def lossandaccuracy(args, loader, model, edge_model, alpha, device):

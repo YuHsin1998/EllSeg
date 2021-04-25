@@ -27,7 +27,7 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE" # Deactive file locking
 embed_log = 5
 EPS=1e-7
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 torch.manual_seed(0)
 torch.backends.cudnn.deterministic = True
