@@ -79,21 +79,29 @@ if __name__ == '__main__':
 
     # Open relevant train/test object
     f = open(os.path.join(args.test_mode,'cond_'+str(args.curObj)+'.pkl'), 'rb')
-
-    # Get splits
     trainObj, validObj, _ = pickle.load(f)
-    trainObj.path2data = os.path.join(args.path2data, 'Datasets', 'All/New')
-    validObj.path2data = os.path.join(args.path2data, 'Datasets', 'All/New')
     trainObj.augFlag = True
     validObj.augFlag = False
 
     ff = open(os.path.join('baseline', 'cond_LPW.pkl'), 'rb')
-
     lpw_validObj, _, lpw_testObj = pickle.load(ff)
-    lpw_validObj.path2data = os.path.join(args.path2data, 'Datasets', 'TEyeD-h5-Edges')
     lpw_validObj.augFlag = False
-    lpw_testObj.path2data = os.path.join(args.path2data, 'Datasets', 'TEyeD-h5-Edges')
     lpw_testObj.augFlag = False
+
+    if(args.id == 0):
+        trainObj.path2data = os.path.join(args.path2data, 'Datasets', 'All/New')
+        validObj.path2data = os.path.join(args.path2data, 'Datasets', 'All/New')
+        lpw_validObj.path2data = os.path.join(args.path2data, 'Datasets', 'TEyeD-h5-Edges')
+        lpw_testObj.path2data = os.path.join(args.path2data, 'Datasets', 'TEyeD-h5-Edges')
+    elif(args.id == 1):
+        trainObj.path2data = os.path.join(args.path2data, 'userdata/riteye.zip/All/New')
+        validObj.path2data = os.path.join(args.path2data, 'userdata/riteye.zip/All/New')
+        lpw_validObj.path2data = os.path.join(args.path2data, 'userdata/lpw.zip/TEyeD-h5-Edges')
+        lpw_testObj.path2data = os.path.join(args.path2data, 'userdata/lpw.zip/TEyeD-h5-Edges')
+    else:
+        assert(1 == 2), 'illeagel id'
+
+
     print(' train, valid, lpw_valid, lpw_testObj: ', len(trainObj), len(validObj), len(lpw_validObj), len(lpw_testObj))
 
     lpw_validloader = DataLoader(lpw_validObj,

@@ -47,6 +47,7 @@ def parse_args():
     parser.add_argument('--disentangle', type=int, default=1, help='Explicit dataset bias removal?')
     parser.add_argument('--test_save_op_masks', type=int, default=0, help='save predicted output masks')
     parser.add_argument('--setting', type=str, default='error', help='where is setting ?')
+    parser.add_argument('--id', type=int, default='0', help = 'default is 0, 1 -> Yunnao')
     args = parser.parse_args()
     opt = vars(args)
     print('------')
