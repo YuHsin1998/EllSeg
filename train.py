@@ -260,6 +260,7 @@ if __name__ == '__main__':
         alpha = linVal(epoch, (0, args.epochs), (0, 1), 0)
 
         for bt, batchdata in enumerate(trainloader):
+            if(bt > 30):break
             img, labels, spatialWeights, distMap, pupil_center, iris_center, elNorm, cond, imInfo = batchdata
             start_edge = time.time()
             img_edge = calc_edge(args, img, BDCN_network, device)

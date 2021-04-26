@@ -296,8 +296,12 @@ def calc_edge(args, img, edge_model, device):
         torch.backends.cudnn.deterministic = False
         torch.backends.cudnn.benchmark = True
         img_edge = edge_model(torch.cat((img, img, img), dim=1).to(device).to(args.prec))[-1]
+
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
+    if (args.edge_thres == 1):
+        rt = torch.ones(img_edge.size()).to(device).to(args.prec)
+        img_edge = torch.where(img_edge >= 0.1, rt, img_edge)
     return img_edge
 
 def lossandaccuracy(args, loader, model, edge_model, alpha, device):
@@ -330,10 +334,11 @@ def lossandaccuracy(args, loader, model, edge_model, alpha, device):
     latent_codes = []
     with torch.no_grad():
         for bt, batchdata in enumerate(tqdm.tqdm(loader)):
+            if(bt > 30):break
             img, labels, spatialWeights, distMap, pupil_center, iris_center, elNorm, cond, imInfo = batchdata
             img_edge = calc_edge(args, img, edge_model, device)
             op_tup = model(img.to(device).to(args.prec),
-                            img_edge,
+                            img_edge.to(device).to(args.prec),
                             labels.to(device).long(),
                             pupil_center.to(device).to(args.prec),
                             elNorm.to(device).to(args.prec),

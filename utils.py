@@ -334,10 +334,11 @@ def lossandaccuracy(args, loader, model, edge_model, alpha, device):
     latent_codes = []
     with torch.no_grad():
         for bt, batchdata in enumerate(tqdm.tqdm(loader)):
+            if(bt > 30):break
             img, labels, spatialWeights, distMap, pupil_center, iris_center, elNorm, cond, imInfo = batchdata
             img_edge = calc_edge(args, img, edge_model, device)
             op_tup = model(img.to(device).to(args.prec),
-                            img_edge,
+                            img_edge.to(device).to(args.prec),
                             labels.to(device).long(),
                             pupil_center.to(device).to(args.prec),
                             elNorm.to(device).to(args.prec),
