@@ -54,6 +54,7 @@ def calc_acc(args, testloader, model, edge_model, device, disp=0):
         print('calc_test')
 
         for bt, batchdata in enumerate(tqdm.tqdm(testloader)):
+            if(args.test_normal and bt > 3):break
             img, labels, spatialWeights, distMap, pupil_center, iris_center, elNorm, cond, imInfo = batchdata
             img_edge = calc_edge(args, img, edge_model, device)
             op_tup = model(img.to(device).to(args.prec),

@@ -50,6 +50,8 @@ if __name__ == '__main__':
 
     args = parse_args()
     setting = get_config(args.setting)
+    print('Setting : ')
+    print(setting)
     device=torch.device("cuda")
 
     if torch.cuda.device_count() > 1:
@@ -107,12 +109,12 @@ if __name__ == '__main__':
     lpw_validloader = DataLoader(lpw_validObj,
                                  batch_size=args.batchsize,
                                  shuffle=False,
-                                 drop_last=False,
+                                 drop_last=True,
                                  num_workers=args.workers)
     lpw_testloader = DataLoader(lpw_testObj,
                             batch_size=args.batchsize,
                             shuffle=False,
-                            drop_last=False,
+                            drop_last=True,
                             num_workers=args.workers)
 
     # load model
@@ -247,7 +249,7 @@ if __name__ == '__main__':
     # print('test edge time : {:.3f}'.format(time.time() - start_edge))
     # print('num:', len(ans))
 
-
+    # miou_valid2, pct_valid2, tg = calc_acc(args, lpw_validloader, model, BDCN_network, device)
     for epoch in range(startEp, args.epochs):
         accLoss = 0.0
         ious = []
@@ -260,7 +262,7 @@ if __name__ == '__main__':
         alpha = linVal(epoch, (0, args.epochs), (0, 1), 0)
 
         for bt, batchdata in enumerate(trainloader):
-            if(bt > 30):break
+            if(args.test_normal and bt > 10):break
             img, labels, spatialWeights, distMap, pupil_center, iris_center, elNorm, cond, imInfo = batchdata
             start_edge = time.time()
             img_edge = calc_edge(args, img, BDCN_network, device)

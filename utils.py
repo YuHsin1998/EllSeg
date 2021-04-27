@@ -261,8 +261,8 @@ def generateImageGrid(I,
 
         if (not cond[i, 0]) or override:
             # If pupil center exists
-            rr, cc = draw.circle(pupil_center[i, 1].clip(6, im.shape[0]-6),
-                                pupil_center[i, 0].clip(6, im.shape[1]-6),
+            rr, cc = draw.disk((pupil_center[i, 1].clip(6, im.shape[0]-6),
+                                pupil_center[i, 0].clip(6, im.shape[1]-6)),
                                  5)
             im[rr, cc, ...] = 255
         I_o.append(im)
@@ -334,7 +334,7 @@ def lossandaccuracy(args, loader, model, edge_model, alpha, device):
     latent_codes = []
     with torch.no_grad():
         for bt, batchdata in enumerate(tqdm.tqdm(loader)):
-            if(bt > 30):break
+            if(args.test_normal and bt > 3):break
             img, labels, spatialWeights, distMap, pupil_center, iris_center, elNorm, cond, imInfo = batchdata
             img_edge = calc_edge(args, img, edge_model, device)
             op_tup = model(img.to(device).to(args.prec),
