@@ -9,6 +9,7 @@ import pickle, matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 from models.RITnet_v2 import DenseNet2D
+from models.deepvog_pytorch import DeepVOG_pytorch
 from args import parse_args
 from tensorboardX import SummaryWriter
 from torch.utils.data import DataLoader
@@ -129,7 +130,12 @@ if __name__ == '__main__':
     logger = Logger(os.path.join(LOGDIR,'logs.log'))
 
     # Ensure model has all necessary weights initialized
-    model = DenseNet2D(setting)
+    if(args.model == 'ritnet_v2'):
+        model = DenseNet2D(setting)
+    elif (args.model == 'deepvog'):
+        model = DeepVOG_pytorch()
+    else: assert 1==2, 'illegal model'
+
     model.selfCorr = args.selfCorr
     model.disentangle = args.disentangle
 
@@ -270,7 +276,7 @@ if __name__ == '__main__':
 
 
 
-            # # Show edge imgs
+            # Show edge imgs
             # pred = 255 - img_edge.cpu().data.numpy()[0, 0, :, :] * 255
             # I_o = []
             # image_ori = torch.cat((img, img, img), dim=1)
@@ -501,7 +507,7 @@ if __name__ == '__main__':
         writer.add_scalar('LPW/mIou', miou_valid2 * 100.0, epoch)
         writer.add_scalar('LPW/Reg_pupil_center', pct_valid2, epoch)
         writer.add_scalar('LPW/Reg_iris_center', tg, epoch)
-        if (miou_valid2 > max(max_miou, 0.82) or pct_valid2 <= min(min_pup_c, 19.0)):
+        if (miou_valid2 > max(max_miou, 0.7) or pct_valid2 <= min(min_pup_c, 25.0)):
             max_miou = max(max_miou, miou_valid2)
             min_pup_c = min(min_pup_c, pct_valid2)
             print('Test Process......Epoch : {}'.format(epoch))

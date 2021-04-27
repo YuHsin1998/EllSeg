@@ -101,7 +101,8 @@ def calc_acc(args, testloader, model, edge_model, device, disp=0):
 
             # print('calc pupil_center : ', pupil_center)
             # print('latent_pupil_center : ', latent_pupil_center)
-            latent_pupil_dist, latent_pupil_dist_bySample = getPoint_metric(pupil_center.numpy(),
+            if(args.model == 'ritnet_v2'):
+                latent_pupil_dist, latent_pupil_dist_bySample = getPoint_metric(pupil_center.numpy(),
                                                                             latent_pupil_center,
                                                                             cond[:, 0].numpy(),
                                                                             img.shape[2:],
@@ -113,34 +114,27 @@ def calc_acc(args, testloader, model, edge_model, device, disp=0):
                                                                       cond[:, 1].numpy(),
                                                                       img.shape[2:],
                                                                       True)  # Unnormalizes the points
-
-            latent_iris_dist, latent_iris_dist_bySample = getPoint_metric(iris_center.numpy(),
+            if (args.model == 'ritnet_v2'):
+                latent_iris_dist, latent_iris_dist_bySample = getPoint_metric(iris_center.numpy(),
                                                                           latent_iris_center,
                                                                           cond[:, 1].numpy(),
                                                                           img.shape[2:],
                                                                           True)  # Unnormalizes the points
 
-            seg_iris_dist, seg_iris_dist_bySample = getPoint_metric(iris_center.numpy(),
+            if (args.model == 'ritnet_v2'):
+                seg_iris_dist, seg_iris_dist_bySample = getPoint_metric(iris_center.numpy(),
                                                                     seg_iris_center,
                                                                     cond[:, 1].numpy(),
                                                                     img.shape[2:],
                                                                     True)  # Unnormalizes the points
 
-            dists_pupil_latent.append(latent_pupil_dist)
-            dists_iris_latent.append(latent_iris_dist)
+            if (args.model == 'ritnet_v2'):
+                dists_pupil_latent.append(latent_pupil_dist)
+                dists_iris_latent.append(latent_iris_dist)
+
+                dists_iris_seg.append(seg_iris_dist)
             dists_pupil_seg.append(seg_pupil_dist)
-            dists_iris_seg.append(seg_iris_dist)
-
             ious.append(iou)
-
-            pup_latent_c = unnormPts(latent_pupil_center,
-                                     img.shape[2:])
-            pup_seg_c = unnormPts(seg_pupil_center,
-                                  img.shape[2:])
-            iri_latent_c = unnormPts(latent_iris_center,
-                                     img.shape[2:])
-            iri_seg_c = unnormPts(seg_iris_center,
-                                  img.shape[2:])
 
         ious = np.stack(ious, axis=0)
         ious = np.nanmean(ious, axis=0)

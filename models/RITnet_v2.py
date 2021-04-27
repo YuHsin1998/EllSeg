@@ -129,7 +129,7 @@ class DenseNet_encoder(nn.Module):
         opSize = sizes['enc']['op']
         ipSize = sizes['enc']['ip']
 
-        self.head = convBlock(in_c=1,
+        self.head = convBlock(in_c=in_c,
                               inter_c=chz,
                               out_c=chz,
                               actfunc=actfunc)
@@ -218,8 +218,10 @@ class DenseNet2D(nn.Module):
         self.disentangle = disentangle
         self.disentangle_alpha = 2
         self.setting = setting
-
-        self.enc = DenseNet_encoder(in_c=1, chz=chz, actfunc=actfunc, growth=growth, norm=norm)
+        input_channels = 1
+        if self.setting['input_concat'] == 1:
+            input_channels = 2
+        self.enc = DenseNet_encoder(in_c=input_channels, chz=chz, actfunc=actfunc, growth=growth, norm=norm)
         self.dec = DenseNet_decoder(self.setting, chz=chz, out_c=3, actfunc=actfunc, growth=growth, norm=norm)
         feature_channels = self.setting['feature_channels']
         if (setting['add_edge'] == 1):
@@ -268,7 +270,12 @@ class DenseNet2D(nn.Module):
                 ID,  # A Tensor containing information about the dataset or subset a entry
                 alpha):  # Alpha score for various loss curicullum
 
+        assert (self.setting['input_concat'] + self.setting['add_edge'] < 2), 'edge can use only 1 time!'
         B, _, H, W = x.shape
+        if(self.setting['only_edge'] == 1):
+            x = x_edge
+        if(self.setting['input_concat'] == 1):
+            x = torch.cat((x, x_edge), 1)
         x4, x3, x2, x1, x = self.enc(x)
         latent = torch.mean(x.flatten(start_dim=2), -1)  # [B, features]
         if(self.setting['add_edge'] == 1):

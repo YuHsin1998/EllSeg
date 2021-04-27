@@ -116,6 +116,7 @@ class DeepVOG_pytorch(nn.Module):
 
     def forward(self,
                 x, # Input batch of images [B, 1, H, W]
+                x_gt, #Edge of images
                 target, # Target semantic output of 3 classes [B, H, W]
                 pupil_center, # Pupil center [B, 2]
                 elNorm, # Normalized ellipse parameters [B, 2, 5]
@@ -142,8 +143,10 @@ class DeepVOG_pytorch(nn.Module):
         elPred = torch.cat([pred_c_seg_pup, torch.rand(B,3).to(pred_c_seg_pup.device),
                             pred_c_seg_pup, torch.rand(B,3).to(pred_c_seg_pup.device)],
                            dim=1) # Bx5
-        embedding = torch.ones(B, 5) # Garbage
-        return out, elPred, embedding, loss.unsqueeze(0)
+        embedding = torch.ones(B, 5).cuda() # Garbage
+        #print(type(out), type(elPred), type(embedding), type(loss))
+        #print(out.device, elPred.device, embedding.device, loss.device)
+        return out, elPred, embedding, loss.unsqueeze(0), embedding
 
 def get_allLoss(op, # Network output
                 target, # Segmentation targets
